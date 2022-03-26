@@ -3,7 +3,7 @@ version: 2.1
 executors:
   application:
     docker:
-      - image: cimg/ruby:2.7.2-browsers
+      - image: cimg/ruby:3.0.2-browsers
         environment:
           TZ: "Asia/Tokyo"
 
@@ -34,6 +34,11 @@ commands:
 # このプロジェクトで実行するジョブの定義
 jobs:
   rspec:
+    executor: application
+    steps:
+      - checkout
+      - bundle-install
+      - run: bundle exec rspec
 
 # ジョブの実行順の指定
 workflows:
