@@ -25,6 +25,7 @@ commands:
             gem update bundler
             bundle config set --local clean 'true'
             bundle config set --local path 'vendor/bundle'
+            bundle config set --local deployment 'true'
             bundle install -j 4
       - save_cache:
           key: << parameters.cache_key >>-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
