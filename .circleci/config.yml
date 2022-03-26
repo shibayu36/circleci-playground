@@ -1,0 +1,43 @@
+version: 2.1
+
+executors:
+  application:
+    docker:
+      - image: cimg/ruby:2.7.2-browsers
+        environment:
+          TZ: "Asia/Tokyo"
+
+commands:
+  bundle-install:
+    parameters:
+      cache_key:
+        default: gem-cache-v1
+        type: string
+    steps:
+      - restore_cache:
+          keys:
+            - << parameters.cache_key >>-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+            - << parameters.cache_key >>-{{ arch }}-{{ .Branch }}-
+            - << parameters.cache_key >>-{{ arch }}-
+      - run:
+          name: bundle install
+          command: |
+            gem update bundler
+            bundle config set --local clean 'true'
+            bundle config set --local path 'vendor/bundle'
+            bundle install -j 4
+      - save_cache:
+          key: << parameters.cache_key >>-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
+
+# このプロジェクトで実行するジョブの定義
+jobs:
+  rspec:
+
+# ジョブの実行順の指定
+workflows:
+  version: 2
+  test:
+    jobs:
+      - rspec
